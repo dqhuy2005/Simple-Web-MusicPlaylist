@@ -79,6 +79,7 @@ const app = {
     },
   ],
 
+  // Scroll
   scrollToIntoView: function () {
     setTimeout(() => {
       $(".song.active").scrollIntoView({
@@ -88,6 +89,7 @@ const app = {
     }, 300);
   },
 
+  // Render playlist song
   render: function () {
     const htmls = this.songs.map((song, index) => {
       return `
@@ -111,7 +113,7 @@ const app = {
     playlist.innerHTML = htmls.join("");
   },
 
-  // Định nghĩa thuộc tính cho object: song
+  // Định nghĩa thuộc tính cho object: song (object nằm trong mảng songs)
   defineProperties: function () {
     Object.defineProperty(this, "currentSong", {
       get: function () {
@@ -125,7 +127,6 @@ const app = {
     const _this = this;
 
     //console.log(_this);
-
     const cd = $(".cd");
     const cdWidth = cd.offsetWidth;
     document.onscroll = function () {
@@ -158,12 +159,12 @@ const app = {
       }
     }
 
-    // Play music
+    // Chạy nhạc
     playBtn.onclick = function () {
-      // If song still playing -> Pause
       isPause();
     };
 
+    // Thanh thời gian
     audio.ontimeupdate = function () {
       if (audio.duration) {
         const progressPercent = (audio.currentTime / audio.duration) * 100;
@@ -206,30 +207,31 @@ const app = {
       _this.scrollToIntoView();
     };
 
+    // Random button
     randomBtn.onclick = function () {
       _this.isRandom = !_this.isRandom;
       randomBtn.classList.toggle("active", _this.isRandom);
     };
 
     repeatBtn.onclick = function () {
-      _this.isRandom = !_this.isRandom;
-      repeatBtn.classList.toggle("active", _this.isRandom);
+      _this.isRepeat = !_this.isRepeat;
+      repeatBtn.classList.toggle("active", _this.isRepeat);
     };
 
+    // Fix: isRandom => shuffle song
     audio.onended = function () {
       if (_this.isRandom) {
         _this.randomSong();
         isPause();
+      } else if (_this.isRepeat) {
+        audio.currentTime = 0;
       } else {
         nextBtn.click();
       }
       audio.play();
     };
-    /*
-    else if (_this.isRandom && _this.isRepeat) {
-        _this.randomSong();
-      }
-        */
+
+    // Click và phát ngay bài hát được chọn
     playlist.onclick = function (e) {
       const songNode = e.target.closest(".song:not(.active)");
       if (songNode || e.target.closest(".option")) {
@@ -237,7 +239,6 @@ const app = {
           _this.currentIndex = Number(songNode.dataset.index);
           _this.loadCurrentSong();
           _this.render();
-
           isPause();
         }
       }
@@ -275,6 +276,7 @@ const app = {
     //console.log(newIndex);
 
     this.currentIndex = newIndex;
+
     this.loadCurrentSong();
   },
 
